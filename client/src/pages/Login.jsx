@@ -1,67 +1,33 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { signin } from "../services/authService";
 
-function Login() {
+export default function Login() {
   const navigate = useNavigate();
-
+  const location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-
+  async function handleSubmit(event) {
+    event.preventDefault(); setError(""); setLoading(true);
     try {
-      await signin(email, password);
-      navigate("/");
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+      const result = await signin(email.trim(), password);
+      navigate(location.state?.from?.pathname || (result.user.isAdmin ? "/admin" : "/"), { replace: true });
+    } catch (err) { setError(err.message); }
+    finally { setLoading(false); }
+  }
 
-  return (
-    <main style={{ padding: "40px", maxWidth: "450px", margin: "auto" }}>
-      <h1>Sign In</h1>
-
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: "15px" }}>
-          <label htmlFor="email">Email</label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={{ display: "block", width: "100%", padding: "10px" }}
-          />
-        </div>
-
-        <div style={{ marginBottom: "15px" }}>
-          <label htmlFor="password">Password</label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            style={{ display: "block", width: "100%", padding: "10px" }}
-          />
-        </div>
-
-        {error && <p role="alert" style={{ color: "red" }}>{error}</p>}
-
-        <button type="submit" disabled={loading}>
-          {loading ? "Signing in..." : "Sign In"}
-        </button>
-      </form>
-    </main>
-  );
+  return <main className="container" style={{ maxWidth: 480 }}>
+    <h1>Sign In</h1>
+    <p>Sign in to access your account.</p>
+    <form onSubmit={handleSubmit} className="portfolio-form">
+      <label>Email<input type="email" value={email} onChange={e => setEmail(e.target.value)} autoComplete="email" required /></label>
+      <label>Password<input type="password" value={password} onChange={e => setPassword(e.target.value)} autoComplete="current-password" required /></label>
+      {error && <p role="alert" className="form-error">{error}</p>}
+      <button type="submit" disabled={loading}>{loading ? "Signing in…" : "Sign In"}</button>
+    </form>
+    <p>Don't have an account? <Link to="/signup">Create one</Link>.</p>
+  </main>;
 }
-
-export default Login;

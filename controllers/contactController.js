@@ -41,11 +41,12 @@ exports.getContactById = async (req, res) => {
 // POST create contact
 exports.createContact = async (req, res) => {
   try {
-    const { firstName, lastName, email, message } = req.body;
+    const { firstName, lastName, contactNumber, email, message } = req.body;
 
     const contact = await Contact.create({
       firstName,
       lastName,
+      contactNumber,
       email,
       message
     });

@@ -8,26 +8,21 @@ import Education from './pages/Education';
 import Services from './pages/Services';
 import Contact from './pages/Contact';
 import Login from './pages/Login';
+import Signup from './pages/Signup';
+import Admin from './pages/Admin';
+import ProtectedRoute from './components/ProtectedRoute';
 
-function App() {
-  return (
-    <Router>
-      {/* Global navigation */}
-      <Navbar />
-
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/projects" element={<Projects />} />
-        <Route path="/education" element={<Education />} />
-        <Route path="/services" element={<Services />} />
-        <Route path="/contact" element={<Contact />} />
-
-        {/* Authentication */}
-        <Route path="/login" element={<Login />} />
-      </Routes>
-    </Router>
-  );
+export default function App() {
+  return <Router><Navbar /><Routes>
+    <Route path="/" element={<Home />} />
+    <Route path="/about" element={<About />} />
+    <Route path="/projects" element={<Projects />} />
+    <Route path="/education" element={<Education />} />
+    <Route path="/services" element={<Services />} />
+    <Route path="/contact" element={<Contact />} />
+    <Route path="/login" element={<Login />} />
+    <Route path="/signup" element={<Signup />} />
+    <Route path="/admin" element={<ProtectedRoute adminOnly><Admin /></ProtectedRoute>} />
+    <Route path="*" element={<main className="container"><h1>Page not found</h1></main>} />
+  </Routes></Router>;
 }
-
-export default App;

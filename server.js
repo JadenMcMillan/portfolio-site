@@ -28,6 +28,9 @@ app.get("/", (req, res) => {
 // Connect to MongoDB
 async function startServer() {
   try {
+    if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
+      throw new Error("JWT_SECRET must be configured with at least 32 characters");
+    }
     await mongoose.connect(process.env.MONGO_URI);
 
     console.log("MongoDB Connected Successfully!");

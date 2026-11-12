@@ -1,38 +1,48 @@
-const API_URL = "/api/auth";
+import { apiRequest } from "./api";
 
-// Sign in and save JWT token
 export async function signin(email, password) {
-  const response = await fetch(`${API_URL}/signin`, {
+  const data = await apiRequest("/auth/signin", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ email, password })
+    body: JSON.stringify({ email, password }),
   });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Sign in failed");
-  }
-
-  // Store token for the current browser tab
   sessionStorage.setItem("token", data.token);
-
+  sessionStorage.setItem("user", JSON.stringify(data.user));
   return data;
 }
 
-// Sign out by removing the token
-export function signout() {
-  sessionStorage.removeItem("token");
+export async function signup(name, email, password) {
+  return apiRequest("/auth/signup", {
+    method: "POST",
+    body: JSON.stringify({ name, email, password }),
+  });
 }
 
-// Retrieve the stored token
+export async function loadProfile() {
+  const data = await apiRequest("/auth/profile");
+  sessionStorage.setItem("user", JSON.stringify(data.user));
+  return data.user;
+}
+
+export async function signout() {
+  try {
+    if (sessionStorage.getItem("token")) {
+      await apiRequest("/auth/signout", { method: "POST" });
+    }
+  } finally {
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("user");
+  }
+}
+
 export function getToken() {
   return sessionStorage.getItem("token");
 }
 
-// Check whether a token is stored
+export function getStoredUser() {
+  try { return JSON.parse(sessionStorage.getItem("user") || "null"); }
+  catch { return null; }
+}
+
 export function isAuthenticated() {
   return Boolean(getToken());
 }
