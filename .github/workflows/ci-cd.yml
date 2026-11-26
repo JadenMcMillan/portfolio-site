@@ -1,0 +1,121 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-build:
+    name: Test and build
+    runs-on: ubuntu-latest
+
+    services:
+      mongo:
+        image: mongo:8
+        ports:
+          - 27017:27017
+
+    env:
+      # Temporary database that exists only during this run
+      MONGO_URI: mongodb://127.0.0.1:27017/portfolio_ci
+      PORT: 5000
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 26
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            client/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          npm ci --prefix client
+          npx cypress install
+
+      - name: Run unit tests
+        run: npm run test:unit
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Create throwaway test credentials
+        run: |
+          ADMIN_PASSWORD="$(openssl rand -hex 16)"
+          echo "::add-mask::$ADMIN_PASSWORD"
+          {
+            echo "JWT_SECRET=$(openssl rand -hex 32)"
+            echo "ADMIN_NAME=CI Admin"
+            echo "ADMIN_EMAIL=ci-admin@example.com"
+            echo "ADMIN_PASSWORD=$ADMIN_PASSWORD"
+            echo "CYPRESS_adminEmail=ci-admin@example.com"
+            echo "CYPRESS_adminPassword=$ADMIN_PASSWORD"
+          } >> "$GITHUB_ENV"
+
+      - name: Run end-to-end tests
+        run: |
+          npm run seed:admin
+          npm start > server.log 2>&1 &
+          for i in $(seq 1 30); do
+            curl -fs http://localhost:5000/api/health && break
+            sleep 1
+          done
+          npm run test:e2e
+
+      - name: Show server log on failure
+        if: failure()
+        run: cat server.log || true
+
+      - name: Upload E2E video and screenshots
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: e2e-evidence
+          path: |
+            cypress/videos
+            cypress/screenshots
+          if-no-files-found: warn
+
+  deploy:
+    name: Deploy to Render
+    needs: test-and-build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger deployment of this commit
+        env:
+          HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "Add the RENDER_DEPLOY_HOOK_URL repository secret." && exit 1
+          fi
+          curl --fail --silent --show-error "${HOOK}&ref=${GITHUB_SHA}" > /dev/null
+          echo "Deployment requested for ${GITHUB_SHA}"
+
+      - name: Wait until the live site runs this commit
+        env:
+          APP_URL: ${{ vars.APP_URL }}
+        run: |
+          if [ -z "$APP_URL" ]; then
+            echo "Add the APP_URL repository variable." && exit 1
+          fi
+          for i in $(seq 1 60); do
+            BODY="$(curl -fs --max-time 20 "${APP_URL%/}/api/health" || true)"
+            echo "Attempt $i: ${BODY:-no response yet}"
+            if echo "$BODY" | grep -q "$GITHUB_SHA"; then
+              echo "Live site is running commit ${GITHUB_SHA}"
+              exit 0
+            fi
+            sleep 15
+          done
+          echo "Timed out waiting for the deployment" && exit 1

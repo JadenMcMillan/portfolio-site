@@ -18,7 +18,7 @@ function Home() {
         <span style={{ color: '#000000', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '0.9rem', display: 'block', marginBottom: '0.75rem' }}>
           Available for Select Opportunities
         </span>
-        <h1 style={{ background: 'linear-gradient(to right, #94e0ab, #154922)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', fontSize: '3.25rem', marginBottom: '1.25rem', lineHeight: '1.15' }}>
+        <h1 style={{ background: 'linear-gradient(to right, #2f7d4a, #154922)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', fontSize: '3.25rem', marginBottom: '1.25rem', lineHeight: '1.15' }}>
           Crafting Clean Code & <br />
           <span style={{ background: 'linear-gradient(to right, #c76969, #631010)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
             Functional Digital Experiences
@@ -30,24 +30,10 @@ function Home() {
         
         {/* Primary Action Row */}
         <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-                    {/* Main required button that directs visitors to the About Page */}
-          <Link to="/about">
-            <button style={{ backgroundColor: '#2563eb', padding: '0.85rem 2rem' }}>
-              Learn More About Me
-            </button>
-          </Link>
-          <Link to="/projects">
-            <button style={{ backgroundColor: '#2563eb', padding: '0.85rem 2rem' }}>
-              Explore My Projects →
-            </button>
-          </Link>
-          <Link to="/contact">
-            <button style={{ backgroundColor: '#fff', color: '#1f2937', border: '1px solid #d1d5db', padding: '0.85rem 2rem' }}
-                    onMouseOver={(e) => { e.target.style.backgroundColor = '#f9fafb'; }}
-                    onMouseOut={(e) => { e.target.style.backgroundColor = '#fff'; }}>
-              Get in Touch
-            </button>
-          </Link>
+          {/* Main required button that directs visitors to the About Page */}
+          <Link to="/about" className="button-link">Learn More About Me</Link>
+          <Link to="/projects" className="button-link">Explore My Projects →</Link>
+          <Link to="/contact" className="button-link">Get in Touch</Link>
         </div>
       </section>
 
@@ -71,7 +57,7 @@ function Home() {
       {/* --- Section 3: Summary Call-To-Action Mission Banner --- */}
       <section style={{ backgroundColor: '#6b3232', color: 'white', borderRadius: '16px', padding: '3rem', textAlign: 'center', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
         <h2 style={{ color: '#ffffff', fontSize: '1.75rem', marginBottom: '1rem' }}>Interested in building a project together?</h2>
-        <p style={{ color: '#9ca3af', maxWidth: '550px', margin: '0 auto 2rem auto', fontSize: '1.05rem' }}>
+        <p style={{ color: '#f3f4f6', maxWidth: '550px', margin: '0 auto 2rem auto', fontSize: '1.05rem' }}>
           Whether you need web development, mobile app development, or API integration, let's connect!
         </p>
         <Link to="/about">

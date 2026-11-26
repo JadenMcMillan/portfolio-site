@@ -1,5 +1,8 @@
 require("dotenv").config();
 
+const fs = require("fs");
+const path = require("path");
+
 const express = require("express");
 const mongoose = require("mongoose");
 const contactRoutes = require("./routes/contactRoutes");
@@ -20,10 +23,35 @@ app.use("/api/qualifications", qualificationRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 
-// Welcome route
-app.get("/", (req, res) => {
-  res.send("Welcome to MyPortfolio Backend!");
+// Health check: also reports which commit is deployed (set by Render)
+app.get("/api/health", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    commit: process.env.RENDER_GIT_COMMIT || "local"
+  });
 });
+
+// Unknown API routes return JSON instead of the React page
+app.use("/api", (req, res) => {
+  res.status(404).json({ message: "API route not found" });
+});
+
+// Serve the built React app when it exists (production and CI)
+const clientDist = path.join(__dirname, "client", "dist");
+
+if (fs.existsSync(clientDist)) {
+  app.use(express.static(clientDist));
+
+  // Let React Router handle page URLs such as /projects or /admin
+  app.use((req, res, next) => {
+    if (req.method !== "GET" || path.extname(req.path)) return next();
+    res.sendFile(path.join(clientDist, "index.html"));
+  });
+} else {
+  app.get("/", (req, res) => {
+    res.send("Welcome to MyPortfolio Backend!");
+  });
+}
 
 // Connect to MongoDB
 async function startServer() {

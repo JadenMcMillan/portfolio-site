@@ -2,7 +2,11 @@
   "scripts": {
     "dev": "concurrently -k \"nodemon server.js\" \"npm run dev --prefix client\"",
     "start": "node server.js",
-    "seed:admin": "node seedAdmin.js"
+    "seed:admin": "node seedAdmin.js",
+    "build": "npm run build --prefix client",
+    "test:unit": "npm test --prefix client",
+    "cy:open": "cypress open",
+    "test:e2e": "cypress run"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
@@ -13,6 +17,7 @@
   },
   "devDependencies": {
     "concurrently": "^10.0.6",
+    "cypress": "^16.4.0",
     "nodemon": "^3.1.14"
   }
 }

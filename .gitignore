@@ -7,4 +7,10 @@ client/node_modules/
 
 client/dist/
 
+# Test output
+cypress/videos/
+cypress/screenshots/
+cypress/downloads/
+server.log
+
 npm-debug.log*
