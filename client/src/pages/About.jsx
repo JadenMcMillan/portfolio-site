@@ -1,6 +1,6 @@
 import React from 'react';
 // 1. Import photo from assets directory
-import profilePic from '../assets/Profile.jpg';
+import profilePic from '../assets/Profile-360.webp';
 
 function About() {
   return (
@@ -12,6 +12,9 @@ function About() {
         <img 
           src={profilePic} 
           alt="Jaden's Profile Picture" 
+          width="180"
+          height="180"
+          decoding="async"
           style={{ 
             borderRadius: '50%', 
             width: '180px', 

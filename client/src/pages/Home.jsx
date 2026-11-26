@@ -16,7 +16,7 @@ function Home() {
       {/* --- Section 1: Dynamic Hero Header Section --- */}
       <section style={{ textAlign: 'center', marginBottom: '5rem', padding: '2rem 0' }}>
         <span style={{ color: '#000000', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '0.9rem', display: 'block', marginBottom: '0.75rem' }}>
-          Available for Select Opportunities
+          Final Release · November 2026
         </span>
         <h1 style={{ background: 'linear-gradient(to right, #2f7d4a, #154922)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', fontSize: '3.25rem', marginBottom: '1.25rem', lineHeight: '1.15' }}>
           Crafting Clean Code & <br />
